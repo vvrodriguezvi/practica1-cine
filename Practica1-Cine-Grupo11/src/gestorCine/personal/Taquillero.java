@@ -34,6 +34,8 @@ public class Taquillero extends Empleado implements Serializable {
 		taquilleros.add(this);
 	}
 
+	//metodos
+	
 	public void atenderCliente(Cliente cliente, ByC byc) {
 		if(cliente.getRecibos().size() == 0) {
 			Random rand = new Random();
@@ -51,52 +53,24 @@ public class Taquillero extends Empleado implements Serializable {
 		this.getServicios().remove(servicio);
 	}
 
-	/**
-	 * 
-	 * @param servicio
-	 * @summary El metodo asignarServicio recibe como parametro un servicio y lo
-	 *          agrega a la lista de servicios del tecnico en cuestion.
-	 * 
-	 */
 	public void asignarServicio(Servicio servicio) {
 		this.getServicios().add(servicio);
 	}
 
-	/**
-	 * 
-	 * @param tecnico
-	 * @param producto
-	 * @param cliente
-	 * @summary generar servicio crea un servicio para revisar un producto que se le
-	 *          asigna a la lista de servicios dependiente que lo creo y al tecnico
-	 *          que va a realizarlo.
-	 *          
-	 */
 	public void generarServicio(Supervisor supervisor, ByC byc, Cliente cliente) {
 		Servicio servicio = new Servicio(supervisor, byc, cliente, this);
 		supervisor.asignarServicio(servicio);
 		asignarServicio(servicio);
 	}
 
-	/**
-	 * 
-	 * @param servicio
-	 * @summary Se hace entrega del producto al dueno (cliente) para que lo revise y
-	 *          recibir luego el pago.
-	 *          
-	 */
+	
 	public void finalizarServicio(Servicio servicio) {
 		informarCliente(servicio);
 		entregarProducto(servicio);
 	}
-
-	/**
-	 * 
-	 * @param servicio
-	 * @summary metodo que entrega una factura del servicio al cliente, la factura contiene el identificador del servicio,
-	 * el nombre y cedula del cliente, y el producto que fue reparado.
-	 * 
-	 */
+	
+	//factura
+	
 	private void informarCliente(Servicio servicio) {
 		Cliente cliente = servicio.getCliente();
 		String recibo = "Factura #" + servicio.getId() + 
@@ -133,14 +107,14 @@ public class Taquillero extends Empleado implements Serializable {
 	}
 
 	public String toString() {
-		return "Dependiente: " + this.getNombre();
+		return "Taquillero: " + this.getNombre();
 	}
 
 	public static List<Taquillero> getTaquilleros() {
 		return taquilleros;
 	}
 
-	public static void setDependientes(List<Taquillero> taquilleros) {
+	public static void setTaquilleros(List<Taquillero> taquilleros) {
 		Taquillero.taquilleros = taquilleros;
 	}
 
