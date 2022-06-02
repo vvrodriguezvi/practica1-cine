@@ -1,5 +1,7 @@
 package gestorCine.tienda;
 
+//clase enun precio menu
+
 public enum PrecioCine {
 	BOLETA(14500),  
 	COMBO1(15500), //PALOMITAS PEQUEÑA+GASEOSA

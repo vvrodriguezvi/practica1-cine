@@ -42,7 +42,7 @@ public class Almacen implements Serializable{
 		return taquillas;
 	}
 
-	public static void setComponentes(List<Taquilla> taquillas) {
+	public static void setTaquillas(List<Taquilla> taquillas) {
 		Almacen.taquillas = taquillas;
 	}
 	

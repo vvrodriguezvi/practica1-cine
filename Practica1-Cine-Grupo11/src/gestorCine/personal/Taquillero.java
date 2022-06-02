@@ -14,8 +14,7 @@ public class Taquillero extends Empleado implements Serializable {
 
 	static List<Taquillero> taquilleros;
 	static {
-		taquilleros = new ArrayList<Taquillero>();
-		
+		taquilleros = new ArrayList<Taquillero>();	
 	}
 
 	private CajaRegistradora cajaRegistradora;
@@ -38,30 +37,16 @@ public class Taquillero extends Empleado implements Serializable {
 	public void atenderCliente(Cliente cliente, ByC byc) {
 		if(cliente.getRecibos().size() == 0) {
 			Random rand = new Random();
-			Supervisor supervidor = Supervisor.supervisores.get(rand.nextInt(Supervisor.supervisores.size()));
+			Supervisor supervisor = Supervisor.supervisores.get(rand.nextInt(Supervisor.supervisores.size()));
 			generarServicio(supervisor, byc, cliente);
 		}
 	}
 
-	/**
-	 * 
-	 * @param servicio
-	 * @summary Registra el pago en la caja registradora con el costodel servicio
-	 *          que decidio el tecnico y luego quita el servicio.
-	 *          
-	 */
 	public void registrarPago(Servicio servicio) {
-		cajaRegistradora.registrarVenta(servicio.getCosto() * MARGEN_GANANCIA, servicio);
+		cajaRegistradora.registrarVenta(servicio.getCosto() * 
+				MARGEN_GANANCIA, servicio);
 		quitarServicio(servicio);
 	}
-
-	/**
-	 * 
-	 * @param servicio
-	 * @summary El metodo quitarServicio recibe como parametro un servicio y lo
-	 *          remueve de la lista de servicios del tecnico en cuestion.
-	 * 
-	 */
 	public void quitarServicio(Servicio servicio) {
 		this.getServicios().remove(servicio);
 	}
@@ -87,9 +72,9 @@ public class Taquillero extends Empleado implements Serializable {
 	 *          que va a realizarlo.
 	 *          
 	 */
-	public void generarServicio(Tecnico tecnico, Producto producto, Cliente cliente) {
-		Servicio servicio = new Servicio(tecnico, producto, cliente, this);
-		tecnico.asignarServicio(servicio);
+	public void generarServicio(Supervisor supervisor, ByC byc, Cliente cliente) {
+		Servicio servicio = new Servicio(supervisor, byc, cliente, this);
+		supervisor.asignarServicio(servicio);
 		asignarServicio(servicio);
 	}
 
@@ -101,7 +86,7 @@ public class Taquillero extends Empleado implements Serializable {
 	 *          
 	 */
 	public void finalizarServicio(Servicio servicio) {
-		notificarCliente(servicio);
+		informarCliente(servicio);
 		entregarProducto(servicio);
 	}
 
@@ -112,31 +97,20 @@ public class Taquillero extends Empleado implements Serializable {
 	 * el nombre y cedula del cliente, y el producto que fue reparado.
 	 * 
 	 */
-	private void notificarCliente(Servicio servicio) {
+	private void informarCliente(Servicio servicio) {
 		Cliente cliente = servicio.getCliente();
-		String recibo = "Factura #" + servicio.getIdentificador() + 
+		String recibo = "Factura #" + servicio.getId() + 
 				"\n" + "Cliente: " + cliente.getNombre()  + " con cedula " + cliente.getCedula()
 				+ "\nCosto total: " + servicio.getCosto() * MARGEN_GANANCIA
-				+ "\n" + "Recibir el producto: " + servicio.getProducto().toString();
+				+ "\n" + "Recibir el producto: " + servicio.getByc().toString();
 		cliente.recibirRecibo(recibo);
 	}
 
-	/**
-	 * 
-	 * @param servicio
-	 * @summary metodo de entrega del producto al cliente dueno.
-	 * 
-	 */
+
 	private void entregarProducto(Servicio servicio) {
-		servicio.getCliente().recibirProducto(servicio.getProducto());
+		servicio.getCliente().recibirProducto(servicio.getByc());
 	}
 	
-	/**
-	 * 
-	 * @param servicio
-	 * @summary calcula el precio del servicio que el cliente pagar�, utilizando costo asignado por el tecnico.
-	 * 
-	 */
 	public void cobrarServicio(Servicio servicio) {
 		double cobro = servicio.getCosto() * MARGEN_GANANCIA;
 		servicio.getCliente().pagarServicio(servicio, cobro);
@@ -162,26 +136,18 @@ public class Taquillero extends Empleado implements Serializable {
 		return "Dependiente: " + this.getNombre();
 	}
 
-	public static List<Dependiente> getDependientes() {
-		return dependientes;
+	public static List<Taquillero> getTaquilleros() {
+		return taquilleros;
 	}
 
-	public static void setDependientes(List<Dependiente> dependientes) {
-		Dependiente.dependientes = dependientes;
+	public static void setDependientes(List<Taquillero> taquilleros) {
+		Taquillero.taquilleros = taquilleros;
 	}
 
 	public static double getMargenGanancia() {
 		return MARGEN_GANANCIA;
 	}
 	
-	/**
-	 * 
-	 * @return lista de strings
-	 * @summary Una de las 5 funcionalidades primarias, mira la lista de empleados, y ya sea un dependiente
-	 * o un tecnico, cobra su respectivo salario, lo cual le resta un porcentaje a la caja de la tienda y le suma a la
-	 * cartera de cada empleado su respectivo salario.
-	 * 
-	 */
 	public List<String> liquidar() {
 		
 		CajaRegistradora caja = this.cajaRegistradora;
@@ -189,21 +155,18 @@ public class Taquillero extends Empleado implements Serializable {
 		List<String> liquidaciones = new ArrayList<String>();
 		
 		double contador = 0;
-		//Se mira la lista de empleados, donde esta el dependiente y los tecnicos.
+		
 		for (Empleado empleado : Empleado.getEmpleados()) {
 			double carteraInicial = empleado.getCartera();
 			
-			//Utiliza la ligadura dinamica para utilizar el metodo ya sea de dependiente o de tecnico.
 			empleado.cobrarSalario(caja);
 
 			double carteraAhora = empleado.getCartera();
 			double liquidado = carteraAhora - carteraInicial;
-			//Se va contando cuanto cobra cada empleado para poder descontarlo de la caja.
 			contador += liquidado;
 			liquidaciones.add("El " + empleado.toString() + " ha recibido " + Math.round(liquidado) + " por su trabajo.");
 		}
 		
-		//Se descuenta de la caja lo cobrado por los empleados.
 		caja.setTotalIngresos(caja.getTotalIngresos() - contador);
 		return liquidaciones;
 	}

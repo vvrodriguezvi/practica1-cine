@@ -19,6 +19,7 @@ public class Servicio implements Serializable {
 	private Date fecha;
 	private Cliente cliente;
 	private Taquillero taquillero;
+	private String consulta;
 	private double costo;
 	
 	static {
@@ -33,6 +34,7 @@ public class Servicio implements Serializable {
 		this.setFecha(new Date());
 		this.cliente = cliente;
 		this.taquillero = taquillero;
+		this.pagado = false;
 		
 		if (servicios.isEmpty())
 			id = 0;
@@ -54,32 +56,15 @@ public class Servicio implements Serializable {
 				+ "\nProducto asociado: " + this.byc
 				+ "\nPagado: " + this.pagado + "\n";
 	}
-	
+
 	//Getter y setter
 	
-	public double getCosto() {
-		return costo;
-	}
-	
-	
-	public boolean isPagado() {
-		return pagado;
-	}
-	
-	public void setCosto(double costo) {
-		this.costo = costo;
-	}
-
-	public int getIdentificador() {
+	public int getId() {
 		return id;
 	}
 
-	public Cliente getCliente() {
-		return cliente;
-	}
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public static List<Servicio> getServicios() {
@@ -94,6 +79,26 @@ public class Servicio implements Serializable {
 		return supervisor;
 	}
 
+	public void setSupervisor(Supervisor supervisor) {
+		this.supervisor = supervisor;
+	}
+
+	public boolean isPagado() {
+		return pagado;
+	}
+
+	public void setPagado(boolean pagado) {
+		this.pagado = pagado;
+	}
+
+	public ByC getByc() {
+		return byc;
+	}
+
+	public void setByc(ByC byc) {
+		this.byc = byc;
+	}
+
 	public Date getFecha() {
 		return fecha;
 	}
@@ -101,19 +106,43 @@ public class Servicio implements Serializable {
 	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
-	
-	public void setPagado(boolean pagado){
-		this.pagado = pagado;
-	}
-	
-	
-	public ByC getByC() {
-		return byc;
+
+	public Cliente getCliente() {
+		return cliente;
 	}
 
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
 
 	public Taquillero getTaquillero() {
 		return taquillero;
 	}
+
+	public void setTaquillero(Taquillero taquillero) {
+		this.taquillero = taquillero;
+	}
+
+	public double getCosto() {
+		return costo;
+	}
+
+	public void setCosto(double costo) {
+		this.costo = costo;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public String getConsulta() {
+		return consulta;
+	}
+
+	public void setConsulta(String consulta) {
+		this.consulta = consulta;
+	}
+	
+	
 	
 }

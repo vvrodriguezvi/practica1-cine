@@ -23,9 +23,10 @@ public class Supervisor extends Empleado implements Serializable {
 		supervisores.add(this);
 	}
 	
+	//verificar problema !
 	
-	private List<Taquilla> verificarProblemas(Servicio servicio){
-		ByC byc = servicio.getByC();
+	private List<Taquilla> verificarProducto(Servicio servicio){
+		ByC byc = servicio.getByc();
 		List<Taquilla> noDis = new ArrayList<Taquilla>();
 		for (Taquilla taquilla : byc.getTaquillas()) {
 			if (taquilla.isDis()) {
@@ -35,27 +36,32 @@ public class Supervisor extends Empleado implements Serializable {
 		return noDis;
 	}
 	
-	private Taquilla buscarProducto(Taquilla taquillas) {
-		return Bodega.sacarComponente(componente.getNombre());
+	//buscarComponente, revisar este metodo
+	
+	private Taquilla buscarProducto(Taquilla taquilla) {
+		return Almacen.sacarProducto(taquilla.getNombre());
 	}
 	
-	public void diagnosticar(Servicio servicio) {
-		servicio.setDiagnostico("Se encontraron problemas en los siguientes componentes del producto: "+ verificarProblemas(servicio));
+	// consultar
+	
+	public void consultarPeli(Servicio servicio) {
+		servicio.setConsulta("Se encontraron disponibles"
+				+ " las siguientes películas en el cinema: "+ verificarProducto(servicio));
 	}
 	
-	public void reparar(Servicio servicio) {
-		Producto producto = servicio.getProducto();
-		List<Componente> averiados = verificarProblemas(servicio);
-		for (Componente componente: averiados) {
-			Componente remplazo = buscarComponente(componente);
-			if (remplazo != null) {
-				Componente componenteBodega = Bodega.sacarComponente(remplazo);
-				producto.quitarComponente(componente);
-				producto.agregarComponente(componenteBodega);
-				servicio.setCosto(servicio.getCosto()+componenteBodega.getPrecio());
+	public void prepararProd(Servicio servicio) {
+		ByC byc = servicio.getByc();
+		List<Taquilla> preparados = verificarProducto(servicio);
+		for (Taquilla taquilla: preparados) {
+			Taquilla entregar = buscarProducto(taquilla);
+			if (entregar != null) {
+				Taquilla productoAlmacen = Almacen.sacarProducto(entregar);
+				byc.quitarProducto(taquilla);
+				byc.agregarProducto(productoAlmacen);
+				servicio.setCosto(servicio.getCosto()+productoAlmacen.getPrecio());
 			}
 		}
-		servicio.setReparado(true);
+		servicio.setPagado(true);
 		quitarServicio(servicio);
 	}
 	
@@ -77,4 +83,6 @@ public class Supervisor extends Empleado implements Serializable {
 	public String toString() {
 		return "Supervisor: " + this.getNombre();
 	}
+
+
 }
