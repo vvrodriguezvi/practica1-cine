@@ -1,13 +1,22 @@
-package gestorCine.personal;
+package gestorAplicacion.personal;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-//import baseDatos.Deserializador;
-import gestorCine.tienda.*;
+import baseDatos.Deserializador;
+import gestorAplicacion.tienda.*;
 
+/**
+ * 
+ * @author Esteban Garcia
+ * @summary Busca representar el comportamiento de un empleado dependiente,
+ *          quien esta a cargo de atender a los clientes y asignar servicios. Es
+ *          mediante el cual se efectuan los pagos y pasan los productos
+ *          solicitados para reparar y se devuelven a sus clientes.
+ *
+ */
 public class Taquillero extends Empleado implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -19,10 +28,8 @@ public class Taquillero extends Empleado implements Serializable {
 	}
 
 	private CajaRegistradora cajaRegistradora;
-	private static final double MARGEN_GANANCIA = 1.5; //revisar por que ni idea de eso :O
+	private static final double GANANCIA = 1.5;
 
-	// constructores
-	
 	public Taquillero(String nombre, int cedula, CajaRegistradora caja) {
 		super(nombre, cedula);
 		this.cajaRegistradora = caja;
@@ -35,11 +42,20 @@ public class Taquillero extends Empleado implements Serializable {
 		taquilleros.add(this);
 	}
 
-	public void atenderCliente(Cliente cliente, ByC byc) {
+	/**
+	 * 
+	 * @param cliente
+	 * @param producto
+	 * @summary Este metodo elige a alguno de los tecnicos disponibles para
+	 *          asignarle un nuevo servicio con el producto entregado por el
+	 *          cliente.
+	 *          
+	 */
+	public void atenderCliente(Cliente cliente, Producto producto) {
 		if(cliente.getRecibos().size() == 0) {
 			Random rand = new Random();
-			Supervisor supervidor = Supervisor.supervisores.get(rand.nextInt(Supervisor.supervisores.size()));
-			generarServicio(supervisor, byc, cliente);
+			Supervisor supervisor = Supervisor.supervisores.get(rand.nextInt(Tecnico.supervisores.size()));
+			generarServicio(supervisor, producto, cliente);
 		}
 	}
 
@@ -51,7 +67,7 @@ public class Taquillero extends Empleado implements Serializable {
 	 *          
 	 */
 	public void registrarPago(Servicio servicio) {
-		cajaRegistradora.registrarVenta(servicio.getCosto() * MARGEN_GANANCIA, servicio);
+		cajaRegistradora.registrarVenta(servicio.getCosto() * GANANCIA, servicio);
 		quitarServicio(servicio);
 	}
 
@@ -77,19 +93,11 @@ public class Taquillero extends Empleado implements Serializable {
 		this.getServicios().add(servicio);
 	}
 
-	/**
-	 * 
-	 * @param tecnico
-	 * @param producto
-	 * @param cliente
-	 * @summary generar servicio crea un servicio para revisar un producto que se le
-	 *          asigna a la lista de servicios dependiente que lo creo y al tecnico
-	 *          que va a realizarlo.
-	 *          
-	 */
-	public void generarServicio(Tecnico tecnico, Producto producto, Cliente cliente) {
-		Servicio servicio = new Servicio(tecnico, producto, cliente, this);
-		tecnico.asignarServicio(servicio);
+	
+	
+	public void generarServicio(Supervisor supervisor, ByC byc, Cliente cliente) {
+		Servicio servicio = new Servicio(Supervisor, byc, cliente, this);
+		supervisor.asignarServicio(servicio);
 		asignarServicio(servicio);
 	}
 
@@ -102,7 +110,7 @@ public class Taquillero extends Empleado implements Serializable {
 	 */
 	public void finalizarServicio(Servicio servicio) {
 		notificarCliente(servicio);
-		entregarProducto(servicio);
+		entregarByC(servicio);
 	}
 
 	/**
@@ -116,7 +124,7 @@ public class Taquillero extends Empleado implements Serializable {
 		Cliente cliente = servicio.getCliente();
 		String recibo = "Factura #" + servicio.getIdentificador() + 
 				"\n" + "Cliente: " + cliente.getNombre()  + " con cedula " + cliente.getCedula()
-				+ "\nCosto total: " + servicio.getCosto() * MARGEN_GANANCIA
+				+ "\nCosto total: " + servicio.getCosto() * GANANCIA
 				+ "\n" + "Recibir el producto: " + servicio.getProducto().toString();
 		cliente.recibirRecibo(recibo);
 	}
@@ -127,7 +135,7 @@ public class Taquillero extends Empleado implements Serializable {
 	 * @summary metodo de entrega del producto al cliente dueno.
 	 * 
 	 */
-	private void entregarProducto(Servicio servicio) {
+	private void entregarByC(Servicio servicio) {
 		servicio.getCliente().recibirProducto(servicio.getProducto());
 	}
 	
@@ -138,7 +146,7 @@ public class Taquillero extends Empleado implements Serializable {
 	 * 
 	 */
 	public void cobrarServicio(Servicio servicio) {
-		double cobro = servicio.getCosto() * MARGEN_GANANCIA;
+		double cobro = servicio.getCosto() * GANANCIA;
 		servicio.getCliente().pagarServicio(servicio, cobro);
 		if (!servicio.isPagado()) {
 			this.cajaRegistradora.registrarVenta(cobro, servicio);
@@ -162,16 +170,16 @@ public class Taquillero extends Empleado implements Serializable {
 		return "Dependiente: " + this.getNombre();
 	}
 
-	public static List<Dependiente> getDependientes() {
-		return dependientes;
+	public static List<Taquillero> getTaquillero() {
+		return taquilleros;
 	}
 
-	public static void setDependientes(List<Dependiente> dependientes) {
-		Dependiente.dependientes = dependientes;
+	public static void setTaquillero(List<Dependiente> taquilleros) {
+		Taquillero.taquilleros = taquilleros;
 	}
 
 	public static double getMargenGanancia() {
-		return MARGEN_GANANCIA;
+		return GANANCIA;
 	}
 	
 	/**

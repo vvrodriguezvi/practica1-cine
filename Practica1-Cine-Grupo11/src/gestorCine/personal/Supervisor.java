@@ -4,7 +4,6 @@ import java.util.*;
 import gestorCine.tienda.*;
 
 
-
 public class Supervisor extends Empleado implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static List<Supervisor> supervisores;
@@ -12,8 +11,6 @@ public class Supervisor extends Empleado implements Serializable {
 		supervisores = new ArrayList<Supervisor>();
 		
 	}
-	
-	// constructores
 	
 	public Supervisor(String nombre, int cedula) {
 		super(nombre, cedula);
@@ -26,29 +23,25 @@ public class Supervisor extends Empleado implements Serializable {
 		supervisores.add(this);
 	}
 	
-	//metodos
 	
-	public void programarPelicula(Servicio servicio) {
-		servicio.setDiagnostico("Se encontraron problemas en los siguientes componentes del producto: "+ verificarSala(servicio));
-	}
-	
-	
-	private List<Componente> verificarSala(Servicio servicio){
-		Producto producto = servicio.getProducto();
-		List<Componente> averiados = new ArrayList<Componente>();
-		for (Componente componente : producto.getComponentes()) {
-			if (componente.isAveriado()) {
-				averiados.add(componente);
+	private List<Taquilla> verificarProblemas(Servicio servicio){
+		ByC byc = servicio.getByC();
+		List<Taquilla> noDis = new ArrayList<Taquilla>();
+		for (Taquilla taquilla : byc.getTaquillas()) {
+			if (taquilla.isDis()) {
+				noDis.add(taquilla);
 			}
 		}
-		return averiados;
+		return noDis;
 	}
 	
-
-	private Componente buscarComponente(Componente componente) {
+	private Taquilla buscarProducto(Taquilla taquillas) {
 		return Bodega.sacarComponente(componente.getNombre());
 	}
 	
+	public void diagnosticar(Servicio servicio) {
+		servicio.setDiagnostico("Se encontraron problemas en los siguientes componentes del producto: "+ verificarProblemas(servicio));
+	}
 	
 	public void reparar(Servicio servicio) {
 		Producto producto = servicio.getProducto();
@@ -65,7 +58,6 @@ public class Supervisor extends Empleado implements Serializable {
 		servicio.setReparado(true);
 		quitarServicio(servicio);
 	}
-
 	
 	public void asignarServicio(Servicio servicio) {
 		this.getServicios().add(servicio);
@@ -83,6 +75,6 @@ public class Supervisor extends Empleado implements Serializable {
 	}
 	
 	public String toString() {
-		return "Tecnico: " + this.getNombre();
+		return "Supervisor: " + this.getNombre();
 	}
 }

@@ -7,7 +7,7 @@ import java.util.List;
 public class Taquilla implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String nombre;
-	private boolean dis;
+	private boolean dis; //disponibilidad del cine
 	private double precio;
 	
 	public static List<Taquilla> taquillas;
