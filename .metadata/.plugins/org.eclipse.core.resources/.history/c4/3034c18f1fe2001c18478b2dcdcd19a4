@@ -1,0 +1,5 @@
+package Cine.personal;
+
+public interface Personal {
+
+}

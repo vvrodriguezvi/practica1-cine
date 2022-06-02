@@ -1,0 +1,5 @@
+package gestorCine.personal;
+
+public interface Personal {
+
+}
